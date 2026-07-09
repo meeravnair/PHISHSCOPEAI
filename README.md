@@ -1,4 +1,4 @@
- 🛡️ PhishScope AI
+ PhishScope AI
 ### Intelligent AI-Powered Phishing URL Detection & Analysis Platform
 
 PhishScope AI is a production-ready cybersecurity tool that detects phishing websites by combining **rule-based security analysis** with **Machine Learning**. It analyzes URLs using structural features, SSL/TLS validation, DNS intelligence, WHOIS information, entropy analysis, and phishing heuristics to identify malicious websites.
@@ -7,7 +7,7 @@ Unlike traditional URL scanners, PhishScope AI explains **why** a URL is conside
 
 ---
 
-## 👨‍💻 Developer
+## Developer
 
 **Meera V Nair**
 
@@ -314,12 +314,6 @@ Each report contains:
 # License
 
 This project is licensed under the **MIT License**.
-
----
-
-# Support
-
-If you found this project useful, consider giving it a ⭐ on GitHub.
 
 ---
 
