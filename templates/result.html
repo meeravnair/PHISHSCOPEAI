@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Report - PhishScope AI</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="glow-bg"></div>
+
+    <div class="wrapper">
+        <!-- Header -->
+        <header>
+            <div class="logo clickable" onclick="window.location.href='/'">
+                <i class="fa-solid fa-shield-halved logo-icon"></i>
+                <div class="logo-text">
+                    <h1>PhishScope <span class="ai-badge">AI</span></h1>
+                    <p>URL Security Intelligence</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="/" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="{{ developer_github }}" target="_blank" class="nav-item"><i class="fa-brands fa-github"></i> Profile</a>
+            </nav>
+        </header>
+
+        <!-- Main Body -->
+        <main class="dashboard-container">
+            <!-- Header Result Summary -->
+            <section class="url-header-card glass-card">
+                <div class="url-meta">
+                    <span class="scan-time"><i class="fa-solid fa-clock"></i> Scanned: {{ result.timestamp }}</span>
+                    <h2 class="target-url-title" title="{{ result.url }}">{{ result.url }}</h2>
+                </div>
+                <div class="actions-group">
+                    <a href="/" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Scan Another</a>
+                </div>
+            </section>
+
+            <!-- Risk Score Panel -->
+            <section class="grid-layout cols-2">
+                <!-- Score Radial Card -->
+                <div class="glass-card score-panel-card risk-level-{{ result.risk_details.risk_level.lower() }}">
+                    <div class="radial-gauge-container">
+                        <div class="radial-gauge-track"></div>
+                        <div class="radial-gauge-fill" style="transform: rotate({{ result.risk_details.final_score * 1.8 }}deg);"></div>
+                        <div class="radial-gauge-center">
+                            <span class="score-value">{{ result.risk_details.final_score }}</span>
+                            <span class="score-max">/100</span>
+                            <span class="gauge-caption">Risk Score</span>
+                        </div>
+                    </div>
+                    <div class="score-verdict">
+                        <h3>{{ result.risk_details.risk_level.upper() }} RISK SEVERITY</h3>
+                        <p>Confidence score calculated using heuristics & ML aggregates.</p>
+                    </div>
+                </div>
+
+                <!-- Classification Card -->
+                <div class="glass-card verdict-panel-card">
+                    <div class="verdict-header">
+                        <h3><i class="fa-solid fa-brain header-icon"></i> Classifier Analysis</h3>
+                    </div>
+                    <div class="ml-result-display">
+                        <div class="prediction-chip ml-class-{{ result.ml_prediction.lower() }}">
+                            <i class="fa-solid fa-robot"></i> Prediction: {{ result.ml_prediction.upper() }}
+                        </div>
+                        <div class="confidence-bar-container">
+                            <div class="label-group">
+                                <span>Classification Confidence</span>
+                                <strong>{{ result.ml_confidence }}%</strong>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill ml-class-{{ result.ml_prediction.lower() }}" style="width: {{ result.ml_confidence }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation Box -->
+                    <div class="rec-box risk-rec-{{ result.risk_details.risk_level.lower() }}">
+                        <i class="fa-solid fa-shield-circle-exclamation rec-icon"></i>
+                        <div class="rec-text">
+                            <strong>Audit Recommendation</strong>
+                            <p>{{ result.ai_recommendation }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Executive Summary -->
+            <section class="glass-card ai-summary-section">
+                <h3><i class="fa-solid fa-wand-magic-sparkles header-icon"></i> AI Executive Summary</h3>
+                <div class="ai-summary-content">
+                    <p style="white-space: pre-line;">{{ result.ai_explanation }}</p>
+                </div>
+            </section>
+
+            <!-- Export Reports Section -->
+            <section class="glass-card export-reports-section">
+                <h3><i class="fa-solid fa-file-export header-icon"></i> Download Professional Security Reports</h3>
+                <p class="subtitle">Export the threat audit analytics in standard report formats for documentation and threat logs.</p>
+                <div class="export-buttons-grid">
+                    <a href="/reports/download/{{ result.report_paths.json }}" class="btn-export btn-json">
+                        <i class="fa-solid fa-file-code"></i> JSON Format
+                    </a>
+                    <a href="/reports/download/{{ result.report_paths.csv }}" class="btn-export btn-csv">
+                        <i class="fa-solid fa-file-csv"></i> CSV Dataset
+                    </a>
+                    <a href="/reports/download/{{ result.report_paths.html }}" class="btn-export btn-html">
+                        <i class="fa-solid fa-file-lines"></i> Interactive HTML
+                    </a>
+                    <a href="/reports/download/{{ result.report_paths.markdown }}" class="btn-export btn-pdf">
+                        <i class="fa-solid fa-file-shield"></i> Markdown Log
+                    </a>
+                </div>
+            </section>
+
+            <!-- Analysis Details Section -->
+            <section class="grid-layout cols-2">
+                <!-- SSL details -->
+                <div class="glass-card details-card">
+                    <h3><i class="fa-solid fa-certificate header-icon"></i> SSL / TLS Integrity</h3>
+                    <table class="details-table">
+                        <tr>
+                            <td>SSL Certificate Present</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-yes' if result.ssl_details.certificate_exists else 'val-no' }}">
+                                    {{ 'Yes' if result.ssl_details.certificate_exists else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SSL Certificate Valid</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-yes' if result.ssl_details.certificate_valid else 'val-no' }}">
+                                    {{ 'Yes' if result.ssl_details.certificate_valid else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Certificate Issuer</td>
+                            <td class="align-right val-text">{{ result.ssl_details.issuer or 'None' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Expiry Timeframe</td>
+                            <td class="align-right val-text">{{ result.ssl_details.certificate_expiry or 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Days to Expiration</td>
+                            <td class="align-right val-text">
+                                {% if result.ssl_details.days_until_expiry is not none %}
+                                    <span class="exp-badge {% if result.ssl_details.days_until_expiry < 15 %}exp-critical{% else %}exp-safe{% endif %}">
+                                        {{ result.ssl_details.days_until_expiry }} days
+                                    </span>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>CN Hostname Matching</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-yes' if result.ssl_details.hostname_match else 'val-no' }}">
+                                    {{ 'Yes' if result.ssl_details.hostname_match else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                    {% if result.ssl_details.ssl_error_message %}
+                    <div class="ssl-error-callout">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>{{ result.ssl_details.ssl_error_message }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Domain Details -->
+                <div class="glass-card details-card">
+                    <h3><i class="fa-solid fa-server header-icon"></i> Domain Reputation & DNS</h3>
+                    <table class="details-table">
+                        <tr>
+                            <td>Direct IP Hostname</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-no' if result.domain_details.is_ip_address else 'val-yes' }}">
+                                    {{ 'Yes (' + result.domain_details.ip_version + ')' if result.domain_details.is_ip_address else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>URL Shortener Domain</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-no' if result.domain_details.is_url_shortener else 'val-yes' }}">
+                                    {{ 'Yes' if result.domain_details.is_url_shortener else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Typosquatting Mimic</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-no' if result.domain_details.is_typosquatting else 'val-yes' }}">
+                                    {{ 'Yes' if result.domain_details.is_typosquatting else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% if result.domain_details.is_typosquatting %}
+                        <tr>
+                            <td>Impersonated Brand</td>
+                            <td class="align-right val-text red-highlight">{{ result.domain_details.impersonated_brand | upper }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td>IDN Homograph Vector</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-no' if result.domain_details.is_homograph_attack else 'val-yes' }}">
+                                    {{ 'Yes' if result.domain_details.is_homograph_attack else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Subdomain Layers</td>
+                            <td class="align-right val-text">{{ result.domain_details.subdomain_count }} subdomains</td>
+                        </tr>
+                        <tr>
+                            <td>Domain Register Date</td>
+                            <td class="align-right val-text">{{ result.domain_details.registration_date or 'Unknown' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Domain Lifespan</td>
+                            <td class="align-right val-text">
+                                {% if result.domain_details.age_in_days is not none %}
+                                    {{ result.domain_details.age_in_days }} days old
+                                {% else %}
+                                    Unknown WHOIS Record
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Reputation Blacklist Match</td>
+                            <td class="align-right">
+                                <span class="val-badge {{ 'val-no' if result.domain_details.is_blacklisted else 'val-yes' }}">
+                                    {{ 'Yes' if result.domain_details.is_blacklisted else 'No' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Heuristic Factor Deductions & Feature Extraction -->
+            <section class="grid-layout cols-2">
+                <!-- Risk deductions list -->
+                <div class="glass-card details-card">
+                    <h3><i class="fa-solid fa-list-check header-icon"></i> Risk Factor Deductions</h3>
+                    <div class="deductions-container">
+                        {% if result.risk_details.reasons %}
+                        <ul class="deductions-list">
+                            {% for reason in result.risk_details.reasons %}
+                            <li class="deduction-item">
+                                <i class="fa-solid fa-circle-minus deduction-icon"></i>
+                                <span>{{ reason }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="no-deductions">
+                            <i class="fa-solid fa-circle-check safe-icon"></i>
+                            <p>No risk factors detected. Full marks applied.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Feature metrics -->
+                <div class="glass-card details-card">
+                    <h3><i class="fa-solid fa-chart-simple header-icon"></i> Lexical Features</h3>
+                    <table class="details-table">
+                        <tr><td>URL Character Length</td><td class="align-right val-text">{{ result.features.url_length }} chars</td></tr>
+                        <tr><td>Hostname length</td><td class="align-right val-text">{{ result.features.hostname_length }} chars</td></tr>
+                        <tr><td>Path Length</td><td class="align-right val-text">{{ result.features.path_length }} chars</td></tr>
+                        <tr><td>Query Parameter Length</td><td class="align-right val-text">{{ result.features.query_length }} chars</td></tr>
+                        <tr><td>Dot (.) count</td><td class="align-right val-text">{{ result.features.dot_count }}</td></tr>
+                        <tr><td>Hyphen (-) count</td><td class="align-right val-text">{{ result.features.hyphen_count }}</td></tr>
+                        <tr><td>Digit count</td><td class="align-right val-text">{{ result.features.digit_count }}</td></tr>
+                        <tr><td>Special character count</td><td class="align-right val-text">{{ result.features.special_char_count }}</td></tr>
+                        <tr><td>Shannon Entropy Score</td><td class="align-right val-text font-mono">{{ result.features.entropy_score }}</td></tr>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <p>PhishScope AI &bull; Production-Grade Threat Intelligence Platform &copy; 2026</p>
+                <p class="credits">Developed By: <strong>{{ developer_name }}</strong> | <a href="{{ developer_github }}" target="_blank"><i class="fa-brands fa-github"></i> Profile</a></p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

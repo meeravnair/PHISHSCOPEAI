@@ -1,0 +1,29 @@
+# Python build & virtual environment ignores
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# IDE and Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-specific ignored assets
+reports/*.json
+reports/*.csv
+reports/*.html
+reports/*.pdf
+trained_model/phishing_model.pkl
+logs/*.log
+temp/

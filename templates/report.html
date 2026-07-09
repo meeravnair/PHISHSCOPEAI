@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishScope AI Security Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 40px;
+            line-height: 1.5;
+        }
+        .report-card {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .header {
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #ef4444;
+            font-size: 26px;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            color: #555555;
+            font-size: 14px;
+        }
+        .meta {
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        .meta table {
+            width: 100%;
+        }
+        .meta td {
+            padding: 4px 0;
+        }
+        .section-title {
+            font-size: 18px;
+            border-bottom: 1px solid #ddd;
+            color: #1e3a8a;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        .score-box {
+            background-color: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .score-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .verdict-box {
+            border-left: 4px solid #ef4444;
+            background-color: #fef2f2;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .verdict-box.safe {
+            border-left: 4px solid #10b981;
+            background-color: #ecfdf5;
+        }
+        .table-data {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .table-data th, .table-data td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .table-data th {
+            background-color: #f9fafb;
+            color: #374151;
+        }
+        .bullet-list {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 13px;
+        }
+        .bullet-list li {
+            margin-bottom: 6px;
+        }
+        footer {
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            text-align: center;
+            font-size: 11px;
+            color: #777777;
+        }
+        @media print {
+            body { padding: 0; }
+            .report-card { border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-card">
+        <div class="header">
+            <h1>PhishScope AI Security Audit</h1>
+            <p>Automated Threat Intelligence Analysis & ML Verification</p>
+        </div>
+
+        <div class="meta">
+            <table>
+                <tr>
+                    <td width="20%"><strong>Target URL:</strong></td>
+                    <td>{{ result.url }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Timestamp:</strong></td>
+                    <td>{{ result.timestamp }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Risk Rating:</strong></td>
+                    <td><strong>{{ result.risk_details.risk_level }} (Score: {{ result.risk_details.final_score }}/100)</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>ML Prediction:</strong></td>
+                    <td>{{ result.ml_prediction }} ({{ result.ml_confidence }}% Confidence)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="verdict-box {% if result.risk_details.final_score >= 60 %}safe{% endif %}">
+            <strong>Security Verdict Recommendation:</strong><br>
+            {{ result.ai_recommendation }}
+        </div>
+
+        <div class="section-title">Threat Assessment Summary</div>
+        <p style="font-size: 13px; white-space: pre-line;">{{ result.ai_explanation }}</p>
+
+        <div class="section-title">Risk Engine Deductions</div>
+        <ul class="bullet-list">
+            {% if result.risk_details.reasons %}
+                {% for reason in result.risk_details.reasons %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            {% else %}
+                <li>No negative risk indicators were detected. The URL matches safety thresholds.</li>
+            {% endif %}
+        </ul>
+
+        <div class="section-title">Lexical Features Analysis</div>
+        <table class="table-data">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>URL Length</td>
+                    <td>{{ result.features.url_length }} chars</td>
+                    <td>Hostname Length</td>
+                    <td>{{ result.features.hostname_length }} chars</td>
+                </tr>
+                <tr>
+                    <td>Path Character Length</td>
+                    <td>{{ result.features.path_length }} chars</td>
+                    <td>Query String Length</td>
+                    <td>{{ result.features.query_length }} chars</td>
+                </tr>
+                <tr>
+                    <td>Dot (.) Count</td>
+                    <td>{{ result.features.dot_count }}</td>
+                    <td>Hyphen (-) Count</td>
+                    <td>{{ result.features.hyphen_count }}</td>
+                </tr>
+                <tr>
+                    <td>Digit Count</td>
+                    <td>{{ result.features.digit_count }}</td>
+                    <td>Special Characters</td>
+                    <td>{{ result.features.special_char_count }}</td>
+                </tr>
+                <tr>
+                    <td>Shannon Entropy Score</td>
+                    <td colspan="3">{{ result.features.entropy_score }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">SSL Certificate & Trust Details</div>
+        <table class="table-data">
+            <tbody>
+                <tr>
+                    <td width="40%">SSL Present / Valid</td>
+                    <td>{{ 'Yes' if result.ssl_details.certificate_exists else 'No' }} / {{ 'Yes' if result.ssl_details.certificate_valid else 'No' }}</td>
+                </tr>
+                <tr>
+                    <td>Issuer Name</td>
+                    <td>{{ result.ssl_details.issuer or 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td>Expiration Date</td>
+                    <td>{{ result.ssl_details.certificate_expiry or 'N/A' }}</td>
+                </tr>
+                {% if result.ssl_details.ssl_error_message %}
+                <tr>
+                    <td>Error Details</td>
+                    <td style="color: #ef4444;">{{ result.ssl_details.ssl_error_message }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <div class="section-title">Domain DNS & Reputation Metrics</div>
+        <table class="table-data">
+            <tbody>
+                <tr>
+                    <td width="40%">Direct IP Destination</td>
+                    <td>{{ 'Yes' if result.domain_details.is_ip_address else 'No' }}</td>
+                </tr>
+                <tr>
+                    <td>Redirection Shortener</td>
+                    <td>{{ 'Yes' if result.domain_details.is_url_shortener else 'No' }}</td>
+                </tr>
+                <tr>
+                    <td>Typosquatting Target Match</td>
+                    <td>{{ 'Yes' if result.domain_details.is_typosquatting else 'No' }} {% if result.domain_details.impersonated_brand %}(Mimicking: {{ result.domain_details.impersonated_brand | upper }}){% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Homograph Vector (IDN)</td>
+                    <td>{{ 'Yes' if result.domain_details.is_homograph_attack else 'No' }}</td>
+                </tr>
+                <tr>
+                    <td>Registration Date (Age)</td>
+                    <td>{{ result.domain_details.registration_date or 'Unknown' }} ({{ result.domain_details.age_in_days or 'Unknown' }} days)</td>
+                </tr>
+                <tr>
+                    <td>Known Reputation Blacklist</td>
+                    <td>{{ 'Yes' if result.domain_details.is_blacklisted else 'No' }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer>
+            Report generated by PhishScope AI on behalf of Meera V Nair &bull; GitHub: <a href="https://github.com/meeravnair" style="color: #555;">https://github.com/meeravnair</a>
+        </footer>
+    </div>
+</body>
+</html>

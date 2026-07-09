@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishScope AI - Phishing URL Detector</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <div class="wrapper">
+        <!-- Header Section -->
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-shield-halved logo-icon"></i>
+                <div class="logo-text">
+                    <h1>PhishScope <span class="ai-badge">AI</span></h1>
+                    <p>URL Security Intelligence</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ developer_github }}" target="_blank" class="nav-item">
+                    <i class="fa-brands fa-github"></i> Developer GitHub
+                </a>
+            </nav>
+        </header>
+
+        <!-- Main Body -->
+        <main class="dashboard-container">
+            <!-- Alert banner for errors -->
+            {% if error %}
+            <div class="alert alert-error">
+                <i class="fa-solid fa-circle-exclamation alert-icon"></i>
+                <span class="alert-msg">{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Hero Panel -->
+            <section class="hero-card">
+                <h2>Intelligent Phishing URL Detection Platform</h2>
+                <p class="subtitle">Identify malicious links, verify SSL certificate authenticity, check WHOIS age metrics, and review predictive Machine Learning intelligence.</p>
+                
+                <form action="/scan" method="POST" id="scanForm" class="scan-form">
+                    <div class="input-group">
+                        <i class="fa-solid fa-link input-icon"></i>
+                        <input type="url" name="url" placeholder="Enter target URL for security auditing (e.g., https://example.com)" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btnScan">
+                        <span class="btn-text">Audit URL</span>
+                        <i class="fa-solid fa-magnifying-glass-chart btn-icon"></i>
+                    </button>
+                </form>
+                
+                <!-- Animated Loader (hidden initially) -->
+                <div class="loader-container" id="loader">
+                    <div class="spinner"></div>
+                    <p>Deploying Threat Intelligence Agents...</p>
+                </div>
+            </section>
+
+            <!-- Dashboard Grid -->
+            <section class="info-grid">
+                <!-- Features Card -->
+                <div class="glass-card feat-card">
+                    <h3><i class="fa-solid fa-screwdriver-wrench header-icon"></i> Core Security Layers</h3>
+                    <ul class="features-list">
+                        <li>
+                            <i class="fa-solid fa-code-compare feat-icon"></i>
+                            <div>
+                                <strong>Lexical Feature Extraction</strong>
+                                <p>Extracts URL structure lengths, character distributions, and Shannon Entropy scores.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-certificate feat-icon"></i>
+                            <div>
+                                <strong>SSL Certificate Inspector</strong>
+                                <p>Validates chain of trust, matches hostnames, and checks expiration status.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-server feat-icon"></i>
+                            <div>
+                                <strong>Domain & WHOIS Analytics</strong>
+                                <p>Inspects domain registration age, typosquatting brand targets, and homograph vectors.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-brain feat-icon"></i>
+                            <div>
+                                <strong>Machine Learning Predictor</strong>
+                                <p>Classifies URLs using Logistic Regression, Decision Trees, or Random Forests.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- History Logs Card -->
+                <div class="glass-card history-card">
+                    <div class="card-header-actions">
+                        <h3><i class="fa-solid fa-clock-rotate-left header-icon"></i> History Logs</h3>
+                        {% if history %}
+                        <form action="/history/clear" method="POST" onsubmit="return confirm('Clear scan history logs?');">
+                            <button type="submit" class="btn btn-clear-history" title="Clear History">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="history-list-wrapper">
+                        {% if history %}
+                        <ul class="history-list">
+                            {% for item in history %}
+                            <li class="history-item">
+                                <div class="history-info">
+                                    <span class="history-url" title="{{ item.url }}">{{ item.url }}</span>
+                                    <span class="history-date">{{ item.timestamp }}</span>
+                                </div>
+                                <div class="history-badge-group">
+                                    <span class="badge badge-risk-{{ item.risk_level.lower() }}">
+                                        Score: {{ item.final_score }}
+                                    </span>
+                                    <span class="badge badge-ml-{{ item.ml_prediction.lower() }}">
+                                        {{ item.ml_prediction }}
+                                    </span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="empty-history">
+                            <i class="fa-solid fa-folder-open empty-icon"></i>
+                            <p>No recent URL scan history available.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer>
+            <div class="footer-container">
+                <p>PhishScope AI &bull; Production-Grade Threat Intelligence Platform &copy; 2026</p>
+                <p class="credits">Developed By: <strong>{{ developer_name }}</strong> | <a href="{{ developer_github }}" target="_blank"><i class="fa-brands fa-github"></i> Profile</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Script Links -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
